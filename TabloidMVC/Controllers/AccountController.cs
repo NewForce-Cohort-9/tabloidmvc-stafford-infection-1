@@ -23,8 +23,40 @@ namespace TabloidMVC.Controllers
             return View();
         }
 
+        public IActionResult Register()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login(Credentials credentials)
+        {
+            var userProfile = _userProfileRepository.GetByEmail(credentials.Email);
+
+            if (userProfile == null)
+            {
+                ModelState.AddModelError("Email", "Invalid email");
+                return View();
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userProfile.Id.ToString()),
+                new Claim(ClaimTypes.Email, userProfile.Email),
+            };
+
+            var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(Credentials credentials)
         {
             var userProfile = _userProfileRepository.GetByEmail(credentials.Email);
 
