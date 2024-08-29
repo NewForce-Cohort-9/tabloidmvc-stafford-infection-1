@@ -68,6 +68,35 @@ namespace TabloidMVC.Controllers
             }
         }
 
+        public IActionResult Delete(int id)
+        {
+            var post = _postRepository.GetPublishedPostById(id);
+            if (post == null)
+            {
+                int userId = GetCurrentUserProfileId();
+                post = _postRepository.GetUserPostById(id, userId);
+                if (post == null)
+                {
+                    return NotFound();
+                }
+            }
+            return View(post);
+        }
+
+        [HttpPost, ActionName("Delete")]
+            [ValidateAntiForgeryToken]
+    public IActionResult DeleteConfirmed(int id)
+    {
+        int userId = GetCurrentUserProfileId();
+        var post = _postRepository.GetUserPostById(id, userId);
+        if (post == null)
+        {
+            return NotFound();
+        }
+        _postRepository.Delete(id);
+        return RedirectToAction("Index");
+    }
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -75,3 +104,4 @@ namespace TabloidMVC.Controllers
         }
     }
 }
+
