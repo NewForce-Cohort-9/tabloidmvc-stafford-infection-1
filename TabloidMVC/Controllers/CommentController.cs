@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TabloidMVC.Models;
+using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
 
 namespace TabloidMVC.Controllers
@@ -7,18 +9,28 @@ namespace TabloidMVC.Controllers
     public class CommentController : Controller
     {
         private readonly ICommentRepository _commentRepository;
-        
-        public CommentController(ICommentRepository commentRepository)
+        private readonly IPostRepository _postRepository;
+
+        public CommentController(ICommentRepository commentRepository, IPostRepository postRepository)
         {
             _commentRepository = commentRepository;
-           
+            _postRepository = postRepository;
         }
         // GET: CommentController
-        public ActionResult Index()
+        public ActionResult Index(int postId)
         {
 
-            var comments = _commentRepository.GetAllComments();
-            return View(comments);
+            var comments = _commentRepository.GetCommentsByPostId(postId);
+            var post = _postRepository.GetPublishedPostById(postId); // Adjusted method to fetch post details
+
+            var viewModel = new CommentViewModel
+            {
+                PostId = postId,
+                PostTitle = post?.Title ?? "Unknown Title", // Provide a default value if post is null
+                Comments = comments
+            };
+
+            return View(viewModel);
         }
 
         // GET: CommentController/Details/5

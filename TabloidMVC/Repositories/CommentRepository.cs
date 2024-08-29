@@ -13,22 +13,63 @@ namespace TabloidMVC.Repositories
     public class CommentRepository: BaseRepository, ICommentRepository
     {
         public CommentRepository(IConfiguration config) : base(config) { }
-        public List<Comment> GetAllComments()
+
+
+        ////COMMENTED OUT CODE: No longer want to GetAllComments, 
+        //////instead want to get comments specific to a selected post
+
+        //public List<Comment> GetAllComments()
+        //{
+        //    using (var conn = Connection)
+        //    {
+        //        conn.Open();
+        //        using (var cmd = conn.CreateCommand())
+        //        {
+        //            //link back to post? instead of showing p.Id in SELECT
+        //            cmd.CommandText = @"
+        //               SELECT c.Id, c.Subject, c.Content, c.UserProfileId, c.CreateDateTime, p.Title, u.DisplayName AS Author, p.Id AS PostId, p.Title AS TitleOfPost
+        //               FROM Comment c
+        //                      LEFT JOIN Post p ON p.Id = c.PostId
+        //                      LEFT JOIN UserProfile u ON c.UserProfileId = u.Id
+        //                      ORDER BY c.CreateDateTime DESC
+        //                      ";
+        //            var reader = cmd.ExecuteReader();
+
+        //            var comments = new List<Comment>();
+
+        //            while (reader.Read())
+        //            {
+        //                comments.Add(NewCommentFromReader(reader));
+        //            }
+
+        //            reader.Close();
+
+        //            return comments;
+        //        }
+        //    }
+        //}
+
+
+        public List<Comment> GetCommentsByPostId(int postId)
         {
             using (var conn = Connection)
             {
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    //link back to post? instead of showing p.Id in SELECT
                     cmd.CommandText = @"
-                       SELECT c.Id, c.Subject, c.Content, c.UserProfileId, c.CreateDateTime, p.Title, u.DisplayName AS Author, p.Id AS PostId, p.Title AS TitleOfPost
-                       FROM Comment c
-                              LEFT JOIN Post p ON p.Id = c.PostId
-                              LEFT JOIN UserProfile u ON c.UserProfileId = u.Id
-                              ";
-                    var reader = cmd.ExecuteReader();
+                 SELECT c.Id, c.Subject, c.Content, c.UserProfileId, c.CreateDateTime, 
+                       p.Id AS PostId, p.Title AS TitleOfPost, 
+                       u.DisplayName AS Author
+                FROM Comment c
+                LEFT JOIN Post p ON p.Id = c.PostId
+                LEFT JOIN UserProfile u ON c.UserProfileId = u.Id
+                WHERE c.PostId = @PostId
+                ORDER BY c.CreateDateTime DESC";  // Assuming you want the most recent first
 
+                    cmd.Parameters.AddWithValue("@PostId", postId);
+
+                    var reader = cmd.ExecuteReader();
                     var comments = new List<Comment>();
 
                     while (reader.Read())
@@ -37,14 +78,15 @@ namespace TabloidMVC.Repositories
                     }
 
                     reader.Close();
-
                     return comments;
                 }
             }
         }
 
 
-
+        //this method is copied from PostRepo
+        // Note: whatever properties you got in here eg. PostId and TitleOfPost you must have above in SQL Query.
+        //Also, use the ALIAS name you gave to identify column by name eg. (reader.GetOrdinal("TitleOfPost")
         private Comment NewCommentFromReader(SqlDataReader reader)
         {
             return new Comment()
@@ -65,5 +107,9 @@ namespace TabloidMVC.Repositories
 
             };
         }
+
+
+       
+
     }
 }
