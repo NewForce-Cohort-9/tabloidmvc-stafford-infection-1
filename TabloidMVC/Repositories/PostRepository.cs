@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Reflection.PortableExecutable;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using TabloidMVC.Models;
@@ -12,6 +11,7 @@ namespace TabloidMVC.Repositories
     public class PostRepository : BaseRepository, IPostRepository
     {
         public PostRepository(IConfiguration config) : base(config) { }
+
         public List<Post> GetAllPublishedPosts()
         {
             using (var conn = Connection)
@@ -132,33 +132,40 @@ namespace TabloidMVC.Repositories
             }
         }
 
-
         public void Add(Post post)
         {
-            using (var conn = Connection)
+            try
             {
-                conn.Open();
-                using (var cmd = conn.CreateCommand())
+                using (var conn = Connection)
                 {
-                    cmd.CommandText = @"
-                        INSERT INTO Post (
-                            Title, Content, ImageLocation, CreateDateTime, PublishDateTime,
-                            IsApproved, CategoryId, UserProfileId )
-                        OUTPUT INSERTED.ID
-                        VALUES (
-                            @Title, @Content, @ImageLocation, @CreateDateTime, @PublishDateTime,
-                            @IsApproved, @CategoryId, @UserProfileId )";
-                    cmd.Parameters.AddWithValue("@Title", post.Title);
-                    cmd.Parameters.AddWithValue("@Content", post.Content);
-                    cmd.Parameters.AddWithValue("@ImageLocation", DbUtils.ValueOrDBNull(post.ImageLocation));
-                    cmd.Parameters.AddWithValue("@CreateDateTime", post.CreateDateTime);
-                    cmd.Parameters.AddWithValue("@PublishDateTime", DbUtils.ValueOrDBNull(post.PublishDateTime));
-                    cmd.Parameters.AddWithValue("@IsApproved", post.IsApproved);
-                    cmd.Parameters.AddWithValue("@CategoryId", post.CategoryId);
-                    cmd.Parameters.AddWithValue("@UserProfileId", post.UserProfileId);
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                            INSERT INTO Post (
+                                Title, Content, ImageLocation, CreateDateTime, PublishDateTime,
+                                IsApproved, CategoryId, UserProfileId )
+                            OUTPUT INSERTED.ID
+                            VALUES (
+                                @Title, @Content, @ImageLocation, @CreateDateTime, @PublishDateTime,
+                                @IsApproved, @CategoryId, @UserProfileId )";
+                        cmd.Parameters.AddWithValue("@Title", post.Title);
+                        cmd.Parameters.AddWithValue("@Content", post.Content);
+                        cmd.Parameters.AddWithValue("@ImageLocation", DbUtils.ValueOrDBNull(post.ImageLocation));
+                        cmd.Parameters.AddWithValue("@CreateDateTime", post.CreateDateTime);
+                        cmd.Parameters.AddWithValue("@PublishDateTime", DbUtils.ValueOrDBNull(post.PublishDateTime));
+                        cmd.Parameters.AddWithValue("@IsApproved", post.IsApproved);
+                        cmd.Parameters.AddWithValue("@CategoryId", post.CategoryId);
+                        cmd.Parameters.AddWithValue("@UserProfileId", post.UserProfileId);
 
-                    post.Id = (int)cmd.ExecuteScalar();
+                        post.Id = (int)cmd.ExecuteScalar();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                // Log exception and/or handle error
+                throw new ApplicationException("An error occurred while adding the post.", ex);
             }
         }
 
