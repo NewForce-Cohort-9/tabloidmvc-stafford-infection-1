@@ -8,6 +8,7 @@ namespace TabloidMVC.Models
         public int Id { get; set; }
 
         [Required]
+        [DisplayName("Title of Post")]
         public string Title { get; set; }
 
         [Required]
