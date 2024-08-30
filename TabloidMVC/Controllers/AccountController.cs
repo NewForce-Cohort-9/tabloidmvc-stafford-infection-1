@@ -59,10 +59,11 @@ namespace TabloidMVC.Controllers
         public async Task<IActionResult> Register(Credentials credentials)
         {
             var userProfile = _userProfileRepository.GetByEmail(credentials.Email);
+           
 
             if (userProfile == null)
             {
-                ModelState.AddModelError("Email", "Invalid email");
+                ModelState.AddModelError("Email", "Invalid ");
                 return View();
             }
 
