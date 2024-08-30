@@ -11,31 +11,32 @@ namespace TabloidMVC.Controllers
     {
         private readonly ICategoryRepository _categoryRepo;
 
-        // ASP.NET will give us an instance of our Walker Repository. This is called "Dependency Injection"
+       
         public CategoryController(ICategoryRepository categoryRepository)
         {
             _categoryRepo = categoryRepository;
         }
-        // GET: CategoryController
+        
         public ActionResult Index()
         {
             List<Category> categories = _categoryRepo.GetAll();
-            return View(categories);
+            List<Category> sortedList = categories.OrderBy(x => x.Name).ToList();
+            return View(sortedList);
         }
-        // GET: CategoryController/Details/5
+        
         public ActionResult Details(int id)
         {
             return View();
         }
         
-        // GET: CategoryController/Delete/5
+       
         public ActionResult Delete(int id)
         {
             Category category = _categoryRepo.GetCategoryById(id);
             return View(category);
         }
 
-        // POST: CategoryController/Delete/5
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, Category category)
