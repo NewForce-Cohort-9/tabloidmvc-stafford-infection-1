@@ -131,13 +131,15 @@ namespace TabloidMVC.Repositories
                     cmd.CommandText = @"
                        SELECT c.Id, c.Subject, c.Content, 
                               c.CreateDateTime, c.UserProfileId,
-                              c.PostId
-                              
+                              c.PostId,
+                              u.DisplayName AS Author,  
+                              p.TItle AS TitleOfPost
                          FROM Comment c
                              
-                             
-                        
+                             LEFT JOIN UserProfile u ON c.UserProfileId = u.Id
+                        LEFT JOIN Post p ON c.PostId = p.Id
                              WHERE c.Id = @id";
+                    //note: must add Author bcs its in NewCommentFromReader method at the bottom that is called in this GetCommentById method
                     // WHERE CreateDateTime < SYSDATETIME()
                     cmd.Parameters.AddWithValue("@id", commentId);
                     var reader = cmd.ExecuteReader();
