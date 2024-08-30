@@ -97,6 +97,42 @@ namespace TabloidMVC.Controllers
         return RedirectToAction("Index");
     }
 
+        public IActionResult Edit(int id)
+            {
+            var post = _postRepository.GetPublishedPostById(id);
+            if (post == null)
+            {
+                int userId = GetCurrentUserProfileId();
+                post = _postRepository.GetUserPostById(id, userId);
+                if (post == null)
+                {
+                    return NotFound();
+                }
+            }
+            var categories = _categoryRepository.GetAll();
+            ViewBag.CategoryOptions = categories;
+           
+            return View(post);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Post post)
+        {
+            try
+            {
+                post.UserProfileId = GetCurrentUserProfileId(); 
+                _postRepository.Update(post);
+                return RedirectToAction("Details", new { id = post.Id });
+            }
+            catch
+            {
+                var categories = _categoryRepository.GetAll();
+                ViewBag.CategoryOptions = categories;
+                return View(post);
+            }
+        }
+
         private int GetCurrentUserProfileId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
