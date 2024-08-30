@@ -9,6 +9,9 @@
         <h1 class="text-secondary">Comments</h1>
         <h1 class="text-black-50">
             @Html.ActionLink(Model.PostTitle, "Details", "Post", new { id = Model.PostId })
+            @*@Html.DisplayFor(modelItem => item.Post.Title)*@ <!--Instead of just displaying Title have a link back to post by clicking Title-->
+            <!--This is the format:-->@* @Html.ActionLink(linkText, actionName, controllerName, routeValues, htmlAttributes)*@
+            <!--This means link : click on Post title, it goes to Post Details page, Detail method is in Post Controller, link will have route parameter PostId which specifies which specific post's details page-->
         </h1>
     </div>
 </section>
@@ -64,8 +67,6 @@
 
 
 
-@*@Html.DisplayFor(modelItem => item.Post.Title)*@ <!--Instead of just displaying Title have a link back to post by clicking Title-->
-<!--This is the format:-->@* @Html.ActionLink(linkText, actionName, controllerName, routeValues, htmlAttributes)*@
 
-<!--look at CommentController, we're using 'Index'' method and we pass 'postId' as parameter-->
-<!--This means link is :Post title, it goes to Details page, Detail's in Post Controller, link will have route parameter PostId which specifies which specific post's details page-->
+
+

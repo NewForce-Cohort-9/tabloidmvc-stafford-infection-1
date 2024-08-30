@@ -22,24 +22,11 @@
                 <input asp-for="Content" class="form-control" />
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
+
             <!-- Hidden fields for PostId and UserProfileId -->
             <input type="hidden" asp-for="PostId" />
             <input type="hidden" asp-for="UserProfileId" />
-            @*<div class="form-group">
-            <label asp-for="UserProfileId" class="control-label"></label>
-            <input asp-for="UserProfileId" class="form-control" />
-            <span asp-validation-for="UserProfileId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreateDateTime" class="control-label"></label>
-                <input asp-for="CreateDateTime" class="form-control" />
-                <span asp-validation-for="CreateDateTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PostId" class="control-label"></label>
-                <input asp-for="PostId" class="form-control" />
-                <span asp-validation-for="PostId" class="text-danger"></span>
-            </div>*@
+            
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
