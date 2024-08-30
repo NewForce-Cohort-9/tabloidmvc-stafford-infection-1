@@ -103,36 +103,90 @@ namespace TabloidMVC.Controllers
             }
         }
 
+        //newer
         // GET: CommentController/Delete/5
-        public ActionResult Delete(int id)
+        //public IActionResult Delete(int commentId)
+        //{
+        //    var comment = _commentRepository.GetCommentById(commentId);
+        //    //if (comment == null)
+        //    //{
+        //    //    int userId = GetCurrentUserProfileId();
+        //    //    comment = _commentRepository.GetUserPostById(id, userId);
+        //    if (comment == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(comment);
+        //}
+
+
+
+        public IActionResult Delete(int id)
         {
-            var comment = _commentRepository.GetCommentsByPostId(id);
+            var comment = _commentRepository.GetCommentById(id);
             if (comment == null)
             {
-                int userId = GetCurrentUserProfileId();
-                comment = _commentRepository.GetUserPostById(id, userId);
-                if (comment == null)
-                {
-                    return NotFound();
-                }
+                return NotFound();
             }
-            return View();
+            return View(comment);
         }
+ 
+
+
+
+
+
+
 
         // POST: CommentController/Delete/5
-        [HttpPost]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Delete(int id, IFormCollection collection)
+        //{
+        //    var comment = _commentRepository.GetCommentById(id);
+        //    try
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
+
+        //newer:
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult DeleteConfirmed(int id)
+        //{
+        //    //int userId = GetCurrentUserProfileId();
+        //    //var comment = _commentRepository.GetUserPostById(id, userId);
+        //    var comment = _commentRepository.GetCommentById(id);
+        //    if (comment == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    _commentRepository.Delete(id);
+        //    return RedirectToAction("Index", new { postId = comment.PostId });
+        //}
+
+
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult DeleteConfirmed(int id)
         {
-            try
+            var comment = _commentRepository.GetCommentById(id);
+            if (comment == null)
             {
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch
-            {
-                return View();
-            }
+            _commentRepository.Delete(id);
+            return RedirectToAction("Index", new { postId = comment.PostId });
         }
+
+
+
 
         private int GetCurrentUserProfileId()
         {
