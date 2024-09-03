@@ -51,6 +51,27 @@ namespace TabloidMVC.Controllers
                 return View(category);
             }
         }
+        // GET: CategoryController/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: CategoryController/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(Category category)
+        {
+            try
+            {
+                _categoryRepo.AddCategory(category);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                return View(category);
+            }
+        }
     }
 }
     
