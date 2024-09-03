@@ -34,8 +34,80 @@ namespace TabloidMVC.Controllers
             }
             return View(tag);
         }
+
+        // GET: TagController/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: TagController/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(Tag tag)
+        {
+            try
+            {
+                _TagRepository.AddTag(tag);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                return View(tag);
+            }
+        }
+        // GET: TagController/Delete/5
+        public ActionResult Delete(int id)
+        {
+            Tag tag = _TagRepository.GetTagById(id);
+            return View(tag);
+        }
+
+        // POST: TagController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id, Tag tag)
+        {
+            try
+            {
+                _TagRepository.DeleteTag(id);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(tag);
+            }
+        }
+        // GET: TagController/Edit/5
+        public ActionResult Edit(int id)
+        {
+            Tag tag = _TagRepository.GetTagById(id);
+
+            if (tag == null)
+            {
+                return NotFound();
+            }
+            return View(tag);
+        }
+
+        // POST: TagController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, Tag tag)
+        {
+            try
+            {
+                _TagRepository.UpdateTag(tag);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View(tag);
+            }
+        }
     }
 }
 
+       
 
-
+       
