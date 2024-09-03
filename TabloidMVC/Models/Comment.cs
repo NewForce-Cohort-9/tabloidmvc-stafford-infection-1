@@ -15,12 +15,12 @@ namespace TabloidMVC.Models
 
         [DisplayName("Author")]
         public int UserProfileId { get; set; }
-        public UserProfile? UserProfile { get; set; } //use UserProfile.DisplayName in Comment's Index.cshtml
+        public UserProfile? UserProfile { get; set; } // Use UserProfile.DisplayName in Comment's Index.cshtml
 
         [DisplayName("Created on")]
         public DateTime CreateDateTime { get; set; }
 
-        public Post? Post { get; set; } //use Post.Title in Comment's Index.cshtml
+        public Post? Post { get; set; } // Use Post.Title in Comment's Index.cshtml
         public int PostId { get; set; }
 
 
