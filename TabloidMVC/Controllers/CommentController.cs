@@ -6,17 +6,21 @@ using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
 
+
 namespace TabloidMVC.Controllers
 {
     public class CommentController : Controller
     {
         private readonly ICommentRepository _commentRepository;
         private readonly IPostRepository _postRepository;
+        private readonly IUserProfileRepository _userProfileRepository;
 
-        public CommentController(ICommentRepository commentRepository, IPostRepository postRepository)
+
+        public CommentController(ICommentRepository commentRepository, IPostRepository postRepository, IUserProfileRepository userProfileRepository)
         {
             _commentRepository = commentRepository;
             _postRepository = postRepository;
+            _userProfileRepository = userProfileRepository;
         }
 
         // GET: CommentController
@@ -24,17 +28,27 @@ namespace TabloidMVC.Controllers
         {
 
             var comments = _commentRepository.GetCommentsByPostId(postId);
-            var post = _postRepository.GetPublishedPostById(postId); // Adjusted method to fetch post details
+            var post = _postRepository.GetPublishedPostById(postId); // Fetch post details
 
-            //var currentUserId = User.Identity.GetUserById(); // Get the current user's ID
+            // Get the current user's ID from authentication 
+            var currentUserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            // Convert the current user's ID to an integer
+            int currentUserId = int.Parse(currentUserIdString); 
 
             var viewModel = new CommentViewModel
             {
                 PostId = postId,
-                PostTitle = post?.Title ?? "Unknown Title", // Provide a default value if post is null
+                PostTitle = post.Title, 
                 Comments = comments,
-               // CurrentUserId = currentUserId // Pass the current user’s ID to the view model
+                CurrentUserId = currentUserId // Pass the current user’s ID to the view model
             };
+
+            // For Debug: check comment's UserProfileId vs user's currentUserId
+            //foreach (var comment in comments)
+            //{
+            //    Console.WriteLine($"Comment UserProfileId: {comment.UserProfileId}, CurrentUserId: {currentUserId}");
+            //}
 
             return View(viewModel);
         }
@@ -50,8 +64,8 @@ namespace TabloidMVC.Controllers
         {
             var comment = new Comment
             {
-                PostId = postId, // Ensure PostId is passed
-                UserProfileId = GetCurrentUserProfileId() // This should be set in the POST method
+                PostId = postId, 
+                UserProfileId = GetCurrentUserProfileId() 
             };
 
             return View(comment);
@@ -113,7 +127,8 @@ namespace TabloidMVC.Controllers
                 {
                     _commentRepository.Edit(id, comment);
 
-                    return RedirectToAction("Index", new { postId = comment.PostId }); //note: going back to Index, so look up at Index method in controller, it takes postId parameter so MUST HAVE  ,new { postId = postId }
+                    return RedirectToAction("Index", new { postId = comment.PostId }); 
+                    // Note: going back to Index, so look up at Index method in controller, it takes postId parameter so MUST HAVE ,new { postId = postId }
                 }
                 catch (Exception ex)
                 {
