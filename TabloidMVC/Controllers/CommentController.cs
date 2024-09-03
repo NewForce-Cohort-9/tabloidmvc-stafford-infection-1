@@ -44,12 +44,6 @@ namespace TabloidMVC.Controllers
                 CurrentUserId = currentUserId // Pass the current user’s ID to the view model
             };
 
-            // For Debug: check comment's UserProfileId vs user's currentUserId
-            //foreach (var comment in comments)
-            //{
-            //    Console.WriteLine($"Comment UserProfileId: {comment.UserProfileId}, CurrentUserId: {currentUserId}");
-            //}
-
             return View(viewModel);
         }
 

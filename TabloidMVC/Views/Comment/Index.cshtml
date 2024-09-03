@@ -51,7 +51,7 @@
                     @Html.DisplayFor(modelItem => item.CreateDateTime)
                 </td>
                 <td>
-                    @Html.Raw($"<div>Debug: Comment UserProfileId: {item.UserProfileId}, CurrentUserId: {Model.CurrentUserId}</div>")
+                    @*@Html.Raw($"<div>Debug: Comment UserProfileId: {item.UserProfileId}, CurrentUserId: {Model.CurrentUserId}</div>")*@ <!--For Debud/checking-->
                     @if (item.UserProfileId == Model.CurrentUserId) // Check if the current user is the author of the comment
                     {
                         @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span>|</span> @Html.ActionLink("Delete", "Delete", new { id = item.Id })
