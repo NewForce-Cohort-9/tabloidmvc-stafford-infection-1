@@ -34,8 +34,31 @@ namespace TabloidMVC.Controllers
             }
             return View(tag);
         }
+
+        // GET: TagController/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: TagController/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(Tag tag)
+        {
+            try
+            {
+                _TagRepository.AddTag(tag);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                return View(tag);
+            }
+        }
     }
 }
 
+       
 
-
+       
