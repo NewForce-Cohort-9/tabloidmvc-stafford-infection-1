@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection.PortableExecutable;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using NuGet.Protocol.Plugins;
@@ -176,6 +177,125 @@ namespace TabloidMVC.Repositories
                 }
             }
         }
+
+
+        //public void Edit(int id, Comment comment)
+        //{
+        //    using (SqlConnection conn = Connection)
+        //    {
+        //        conn.Open();
+
+        //        using (SqlCommand cmd = conn.CreateCommand())
+        //        {
+        //            cmd.CommandText = @"
+        //                    UPDATE Comment
+        //                    SET 
+        //                        Subject = @subject, 
+        //                        Content = @content, 
+        //                        UserProfileId = @userProfileId, 
+        //                        CreateDateTime = @createDateTime, 
+        //                        PostId = @postId
+        //                    WHERE Id = @id";
+
+        //            cmd.Parameters.AddWithValue("@subject", comment.Subject);
+        //            cmd.Parameters.AddWithValue("@content", comment.Content);
+        //            cmd.Parameters.AddWithValue("@userProfileId", comment.UserProfileId);
+        //            cmd.Parameters.AddWithValue("@createDateTime", comment.CreateDateTime);
+        //            cmd.Parameters.AddWithValue("@postId", comment.PostId);
+        //            cmd.Parameters.AddWithValue("@id", id); // Corrected to use id parameter instead of comment.Id
+
+        //            cmd.ExecuteNonQuery();
+
+
+        //        }
+        //    }
+        //}
+
+
+
+       
+
+
+        public void Edit(int id, Comment comment)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                try
+                {
+                   
+
+                    // Update Comment
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                    UPDATE Comment
+                    SET 
+                        Subject = @subject, 
+                        Content = @content, 
+                        PostId = @postId
+                    WHERE Id = @id";
+                        //CreateDateTime = @createDateTime,
+                        //UserProfileId = @userProfileId,
+
+                        // Add parameters to SQL command
+                        cmd.Parameters.AddWithValue("@subject", (object)comment.Subject ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@content", (object)comment.Content ?? DBNull.Value);
+                        //cmd.Parameters.AddWithValue("@userProfileId", comment.UserProfileId);
+                        //cmd.Parameters.AddWithValue("@createDateTime", comment.CreateDateTime);
+                       cmd.Parameters.AddWithValue("@postId", comment.PostId);
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected == 0)
+                        {
+                            throw new Exception("No rows were updated. The comment might not exist.");
+                        }
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    // Log or handle SQL exception
+                    throw new ApplicationException("An SQL error occurred while updating the comment: " + ex.Message, ex);
+                }
+                catch (Exception ex)
+                {
+                    // Log or handle general exception
+                    throw new ApplicationException("An error occurred while updating the comment: " + ex.Message, ex);
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

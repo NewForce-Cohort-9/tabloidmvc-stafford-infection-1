@@ -18,6 +18,7 @@ namespace TabloidMVC.Controllers
             _commentRepository = commentRepository;
             _postRepository = postRepository;
         }
+
         // GET: CommentController
         public ActionResult Index(int postId)
         {
@@ -25,11 +26,14 @@ namespace TabloidMVC.Controllers
             var comments = _commentRepository.GetCommentsByPostId(postId);
             var post = _postRepository.GetPublishedPostById(postId); // Adjusted method to fetch post details
 
+            //var currentUserId = User.Identity.GetUserById(); // Get the current user's ID
+
             var viewModel = new CommentViewModel
             {
                 PostId = postId,
                 PostTitle = post?.Title ?? "Unknown Title", // Provide a default value if post is null
-                Comments = comments
+                Comments = comments,
+               // CurrentUserId = currentUserId // Pass the current user’s ID to the view model
             };
 
             return View(viewModel);
@@ -46,13 +50,14 @@ namespace TabloidMVC.Controllers
         {
             var comment = new Comment
             {
-                PostId = postId, //diff: Ensure PostId is passed
+                PostId = postId, // Ensure PostId is passed
                 UserProfileId = GetCurrentUserProfileId() // This should be set in the POST method
             };
 
             return View(comment);
         }
 
+        // POST: Comment/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Comment comment)
@@ -82,46 +87,45 @@ namespace TabloidMVC.Controllers
         }
 
 
-        // GET: CommentController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: Comment/Edit/5
+        public IActionResult Edit(int id)
         {
-            return View();
+            var comment = _commentRepository.GetCommentById(id);            
+            
+            if (comment == null)
+            {
+                return NotFound();
+            }
+            
+                return View(comment);
+          
         }
 
-        // POST: CommentController/Edit/5
+        // POST: Comment/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult Edit(int id, Comment comment)
         {
-            try
+
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _commentRepository.Edit(id, comment);
+
+                    return RedirectToAction("Index", new { postId = comment.PostId }); //note: going back to Index, so look up at Index method in controller, it takes postId parameter so MUST HAVE  ,new { postId = postId }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "An error occurred while updating the comment. Please try again.");
+            
+                }
             }
-            catch
-            {
-                return View();
-            }
+
+            return View(comment);
         }
 
-        //newer
         // GET: CommentController/Delete/5
-        //public IActionResult Delete(int commentId)
-        //{
-        //    var comment = _commentRepository.GetCommentById(commentId);
-        //    //if (comment == null)
-        //    //{
-        //    //    int userId = GetCurrentUserProfileId();
-        //    //    comment = _commentRepository.GetUserPostById(id, userId);
-        //    if (comment == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(comment);
-        //}
-
-
-
         public IActionResult Delete(int id)
         {
             var comment = _commentRepository.GetCommentById(id);
@@ -131,47 +135,8 @@ namespace TabloidMVC.Controllers
             }
             return View(comment);
         }
- 
-
-
-
-
-
-
 
         // POST: CommentController/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    var comment = _commentRepository.GetCommentById(id);
-        //    try
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //newer:
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult DeleteConfirmed(int id)
-        //{
-        //    //int userId = GetCurrentUserProfileId();
-        //    //var comment = _commentRepository.GetUserPostById(id, userId);
-        //    var comment = _commentRepository.GetCommentById(id);
-        //    if (comment == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    _commentRepository.Delete(id);
-        //    return RedirectToAction("Index", new { postId = comment.PostId });
-        //}
-
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
