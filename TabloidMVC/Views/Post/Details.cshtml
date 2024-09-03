@@ -25,6 +25,12 @@
                 <a asp-controller="Comment" asp-action="Index" asp-route-postId="@Model.Id" class="btn btn-outline-primary mx-1" title="View Comments">
                     <i class="fas fa-comments"></i>
                 </a>
+                <a asp-controller="Comment" asp-action="Create" asp-route-postId="@Model.Id" class="btn btn-outline-primary mx-1" title="Add Comments">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-comment"></i>
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </a>
             </div>
         </section>
         <hr />

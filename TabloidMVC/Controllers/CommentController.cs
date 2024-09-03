@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
+using System.Security.Claims;
 using TabloidMVC.Models;
 using TabloidMVC.Models.ViewModels;
 using TabloidMVC.Repositories;
@@ -39,26 +41,46 @@ namespace TabloidMVC.Controllers
             return View();
         }
 
-        // GET: CommentController/Create
-        public ActionResult Create()
+        // GET: Comment/Create
+        public ActionResult Create(int postId)
         {
-            return View();
+            var comment = new Comment
+            {
+                PostId = postId, //diff: Ensure PostId is passed
+                UserProfileId = GetCurrentUserProfileId() // This should be set in the POST method
+            };
+
+            return View(comment);
         }
 
-        // POST: CommentController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Comment comment)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    comment.CreateDateTime = DateTime.Now;
+                    comment.UserProfileId = GetCurrentUserProfileId();
+
+                    _commentRepository.Add(comment);
+
+                    return RedirectToAction("Index", new { postId = comment.PostId });
+                }
+                catch (Exception ex)
+                {
+
+                    ModelState.AddModelError("", "An error occurred while creating the comment. Please try again.");
+                    Console.WriteLine("Error creating comment: " + ex.Message);
+                    
+                }
             }
-            catch
-            {
-                return View();
-            }
+
+            return View(comment);
+
         }
+
 
         // GET: CommentController/Edit/5
         public ActionResult Edit(int id)
@@ -100,6 +122,12 @@ namespace TabloidMVC.Controllers
             {
                 return View();
             }
+        }
+
+        private int GetCurrentUserProfileId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id);
         }
     }
 }
