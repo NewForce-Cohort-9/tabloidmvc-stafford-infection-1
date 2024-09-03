@@ -83,6 +83,43 @@ namespace TabloidMVC.Repositories
             }
         }
 
+        public void Add(Comment comment)
+        {
+            try
+            {
+                using (var conn = Connection)
+                {
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+            INSERT INTO Comment (
+                Subject, Content, UserProfileId, CreateDateTime, PostId
+            )
+            OUTPUT INSERTED.ID
+            VALUES (
+                @Subject, @Content, @UserProfileId, @CreateDateTime, @PostId
+            )";
+
+                        cmd.Parameters.AddWithValue("@Subject", comment.Subject);
+                        cmd.Parameters.AddWithValue("@Content", comment.Content);
+                        cmd.Parameters.AddWithValue("@UserProfileId", comment.UserProfileId);
+                        cmd.Parameters.AddWithValue("@CreateDateTime", comment.CreateDateTime);
+                        cmd.Parameters.AddWithValue("@PostId", comment.PostId);
+
+
+
+                        comment.Id = (int)cmd.ExecuteScalar();
+                    }
+                }
+            }
+                    catch (Exception ex)
+                    {
+                        // Log exception and/or handle error
+                        throw new ApplicationException("An error occurred while adding the comment.", ex);
+                    }
+        }
+            
 
         //this method is copied from PostRepo
         // Note: whatever properties you got in here eg. PostId and TitleOfPost you must have above in SQL Query.
@@ -107,9 +144,6 @@ namespace TabloidMVC.Repositories
 
             };
         }
-
-
-       
 
     }
 }
