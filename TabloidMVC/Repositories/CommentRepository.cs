@@ -119,7 +119,65 @@ namespace TabloidMVC.Repositories
                         throw new ApplicationException("An error occurred while adding the comment.", ex);
                     }
         }
-            
+
+        //added for DELETE:
+        public Comment GetCommentById(int commentId)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                       SELECT c.Id, c.Subject, c.Content, 
+                              c.CreateDateTime, c.UserProfileId,
+                              c.PostId,
+                              u.DisplayName AS Author,  
+                              p.TItle AS TitleOfPost
+                         FROM Comment c
+                             
+                             LEFT JOIN UserProfile u ON c.UserProfileId = u.Id
+                        LEFT JOIN Post p ON c.PostId = p.Id
+                             WHERE c.Id = @id";
+                    //note: must add Author bcs its in NewCommentFromReader method at the bottom that is called in this GetCommentById method
+                    // WHERE CreateDateTime < SYSDATETIME()
+                    cmd.Parameters.AddWithValue("@id", commentId);
+                    var reader = cmd.ExecuteReader();
+
+                    Comment comment = null;
+
+                    if (reader.Read())
+                    {
+                        comment = NewCommentFromReader(reader);
+                    }
+
+                    reader.Close();
+
+                    return comment;
+                }
+            }
+        }
+
+
+        public void Delete(int commentId)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        DELETE FROM Comment
+                        WHERE Id = @id
+                    ";
+                    cmd.Parameters.AddWithValue("@id", commentId);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
 
         //this method is copied from PostRepo
         // Note: whatever properties you got in here eg. PostId and TitleOfPost you must have above in SQL Query.
